@@ -20,7 +20,6 @@ async function reportChecklistCompletion({githubToken, readmeURL: target_url, ru
     }
 
     const pr = github.context.payload.pull_request
-    console.log("Pull request body: ", pr.body);
 
     // We return here because we want to skip Dependabot PRs silently.
     if (github.context.actor == 'dependabot[bot]') {
@@ -38,6 +37,7 @@ async function reportChecklistCompletion({githubToken, readmeURL: target_url, ru
             repo: github.context.repo.repo,
             pull_number: pr.number
         })
+        console.log("PR updated at: ", resultResult.data.updated_at);
         prBody = resultResult.data.body;
     }
 
