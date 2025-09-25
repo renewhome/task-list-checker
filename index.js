@@ -18,7 +18,8 @@ try {
   run.reportChecklistCompletion({
     githubToken: getInput('github-token'),
     readmeURL: getInput('readme-url'),
-    rule: tagging.rule({skip: ['POST-MERGE:', 'N/A']})
+    rule: tagging.rule({skip: ['POST-MERGE:', 'N/A']}),
+    refresh: core.getInput('refresh') === 'true'
   })
 } catch (error) {
   core.setFailed(error.message)
