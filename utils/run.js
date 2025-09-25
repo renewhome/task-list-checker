@@ -8,9 +8,9 @@ const comment = require('./comment')
 module.exports = {reportChecklistCompletion}
 
 /**
- * @param {{githubToken: string; readmeURL: string; rule: tagging.Rule}} input 
+ * @param {{githubToken: string; readmeURL: string; rule: tagging.Rule, refresh: boolean}} input
  */
-async function reportChecklistCompletion({githubToken, readmeURL: target_url, rule}) {
+async function reportChecklistCompletion({githubToken, readmeURL: target_url, rule, refresh}) {
     const validEvents = ['pull_request']
     const {eventName} = github.context
 
@@ -27,6 +27,9 @@ async function reportChecklistCompletion({githubToken, readmeURL: target_url, ru
         console.log("Skipping dependabot PR")
         return
     }
+
+    let prBody = pr.body;
+    console.log("Refresh is set to: ", refresh);
 
     const octokit = github.getOctokit(githubToken)
     const resultResult = await octokit.rest.pulls.get({
