@@ -28,20 +28,21 @@ async function reportChecklistCompletion({githubToken, readmeURL: target_url, ru
         return
     }
 
-    let prBody = pr.body;
-    console.log("Refresh is set to: ", refresh);
-
     const octokit = github.getOctokit(githubToken)
-    const resultResult = await octokit.rest.pulls.get({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        pull_number: pr.number
-    })
-    const prData = resultResult.data
-    console.log("Fetched PR data: ", prData.body);
+
+    let prBody = pr.body;
+    if (refresh) {
+        console.log("Refreshing PR body from GitHub API");
+        const resultResult = await octokit.rest.pulls.get({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            pull_number: pr.number
+        })
+        prBody = resultResult.data.body;
+    }
 
     const {owner, repo, sha} = {...github.context.repo, sha: pr.head.sha}
-    const tasks = comment.outstandingTasks(extract.checklistItems(pr.body), rule)
+    const tasks = comment.outstandingTasks(extract.checklistItems(prBody), rule)
 
     await octokit.rest.repos.createCommitStatus({
         owner, repo, sha, target_url, ...output.completion(tasks, rule)
