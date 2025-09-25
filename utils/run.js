@@ -41,6 +41,8 @@ async function reportChecklistCompletion({githubToken, readmeURL: target_url, ru
         prBody = resultResult.data.body;
     }
 
+    console.log("PR body: ", prBody);
+
     const {owner, repo, sha} = {...github.context.repo, sha: pr.head.sha}
     const tasks = comment.outstandingTasks(extract.checklistItems(prBody), rule)
 
