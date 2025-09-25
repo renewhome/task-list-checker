@@ -34,7 +34,7 @@ async function reportChecklistCompletion({githubToken, readmeURL: target_url, ru
         repo: github.context.repo.repo,
         pull_number: pr.number
     }).then(({data}) => {
-        console.log("Fetched PR data: ", data);
+        console.log("Fetched PR data: ", data.body);
     }).catch((error) => {
         console.error("Error fetching PR data: ", error);
     });
