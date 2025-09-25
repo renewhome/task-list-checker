@@ -29,6 +29,15 @@ async function reportChecklistCompletion({githubToken, readmeURL: target_url, ru
     }
 
     const octokit = github.getOctokit(githubToken)
+    octokit.rest.pulls.get({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        pull_number: pr.number
+    }).then(({data}) => {
+        console.log("Fetched PR data: ", data);
+    }).catch((error) => {
+        console.error("Error fetching PR data: ", error);
+    });
 
     const {owner, repo, sha} = {...github.context.repo, sha: pr.head.sha}
     const tasks = comment.outstandingTasks(extract.checklistItems(pr.body), rule)
