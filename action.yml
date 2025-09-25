@@ -8,6 +8,10 @@ inputs:
     description: "Custom documentation url (otherwise defaults to README)"
     required: false
     default: "https://github.com/Shopify/task-list-checker#in-a-pull-request"
+  refresh:
+    description: "Whether to refresh the PR body from the GitHub API"
+    required: false
+    default: "false"
 runs:
   using: "node16"
   main: "index.js"

@@ -8,9 +8,9 @@ const comment = require('./comment')
 module.exports = {reportChecklistCompletion}
 
 /**
- * @param {{githubToken: string; readmeURL: string; rule: tagging.Rule}} input 
+ * @param {{githubToken: string; readmeURL: string; rule: tagging.Rule, refresh: boolean}} input
  */
-async function reportChecklistCompletion({githubToken, readmeURL: target_url, rule}) {
+async function reportChecklistCompletion({githubToken, readmeURL: target_url, rule, refresh}) {
     const validEvents = ['pull_request']
     const {eventName} = github.context
 
@@ -20,7 +20,6 @@ async function reportChecklistCompletion({githubToken, readmeURL: target_url, ru
     }
 
     const pr = github.context.payload.pull_request
-    console.log("Pull request body: ", pr.body);
 
     // We return here because we want to skip Dependabot PRs silently.
     if (github.context.actor == 'dependabot[bot]') {
@@ -30,8 +29,22 @@ async function reportChecklistCompletion({githubToken, readmeURL: target_url, ru
 
     const octokit = github.getOctokit(githubToken)
 
+    let prBody = pr.body;
+    if (refresh) {
+        console.log("Refreshing PR body from GitHub API");
+        const resultResult = await octokit.rest.pulls.get({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            pull_number: pr.number
+        })
+        console.log("PR updated at: ", resultResult.data.updated_at);
+        prBody = resultResult.data.body;
+    }
+
+    console.log("PR body: ", prBody);
+
     const {owner, repo, sha} = {...github.context.repo, sha: pr.head.sha}
-    const tasks = comment.outstandingTasks(extract.checklistItems(pr.body), rule)
+    const tasks = comment.outstandingTasks(extract.checklistItems(prBody), rule)
 
     await octokit.rest.repos.createCommitStatus({
         owner, repo, sha, target_url, ...output.completion(tasks, rule)
