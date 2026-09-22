@@ -4,6 +4,10 @@ const core = require('@actions/core')
 const run = require('./utils/run')
 const tagging = require('./utils/tagging')
 
+// TEST-ONLY probe for RN-32757: proves which Node runtime the runner actually
+// resolved for `runs.using`. Remove before merging the node24 bump.
+console.log('RUNTIME CHECK: process.version =', process.version)
+
 /**
  * @param {'github-token' | 'readme-url'} name 
  * @returns {string}
